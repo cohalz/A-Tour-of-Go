@@ -31,8 +31,8 @@ func main() {
 	var i I = T{"hello"}
 	i.M()
 	/*
-	i := T{"hello"}
-	var i T = T{"hello"}
-	ももちろん可能
+		i := T{"hello"}
+		var i T = T{"hello"}
+		ももちろん可能
 	*/
 }
