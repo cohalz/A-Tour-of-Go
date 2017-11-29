@@ -29,10 +29,10 @@ func (t T) M() {
 //T型の変数を作っているがIのインタフェースを実装しているのでIとして受け取れる
 func main() {
 	var i I = T{"hello"}
-	/*
-		i := T{"hello"}
-			var i T = T{"hello"}
-				ももちろん可能
-	*/
 	i.M()
+	/*
+	i := T{"hello"}
+	var i T = T{"hello"}
+	ももちろん可能
+	*/
 }
