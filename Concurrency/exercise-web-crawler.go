@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	//	"time"
 )
 
 type SafeIsVisitedMap struct {
@@ -31,10 +32,12 @@ type Fetcher interface {
 // Crawl uses fetcher to recursively crawl
 // pages starting with url, to a maximum of depth.
 //クロール済みかどうかをmで判定，書込み
-func Crawl(url string, depth int, fetcher Fetcher, m *SafeIsVisitedMap) {
+func Crawl(url string, depth int, fetcher Fetcher, m *SafeIsVisitedMap, wg *sync.WaitGroup) {
 	// TODO: Fetch URLs in parallel.
 	// TODO: Don't fetch the same URL twice.
 	// This implementation doesn't do either:
+	defer wg.Done()
+
 	if depth <= 0 {
 		return
 	}
@@ -54,7 +57,8 @@ func Crawl(url string, depth int, fetcher Fetcher, m *SafeIsVisitedMap) {
 	fmt.Printf("found: %s %q\n", url, body)
 
 	for _, u := range urls {
-		Crawl(u, depth-1, fetcher, m)
+		wg.Add(1)
+		go Crawl(u, depth-1, fetcher, m, wg)
 	}
 	return
 }
@@ -63,7 +67,19 @@ func main() {
 	//mapは自動で初期化されないため必ずmakeを呼ぶ
 	//1つの実体を引き回したいのでポインタ
 	m := &SafeIsVisitedMap{isVisited: make(map[string]bool)}
-	Crawl("http://golang.org/", 4, fetcher, m)
+
+	//WaitGroupを使うことですべてのgoroutineの終了を待つことができる
+	//これも1つの実体を扱いたいのでポインタ
+	wg := &sync.WaitGroup{}
+
+	wg.Add(1)
+	go Crawl("http://golang.org/", 4, fetcher, m, wg)
+
+	wg.Wait()
+
+	//mainが先に終わってしまうため待つにはsleepかWaitGroupを使う
+	//time.Sleep(time.Second)
+
 }
 
 // fakeFetcher is Fetcher that returns canned results.
