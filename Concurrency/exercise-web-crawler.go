@@ -1,11 +1,5 @@
 package main
 
-/*
-やりたいこと
-type MutexMap struct{}を作る
-fetcher.Fetchあたりのタイミングでmap追加，取得
-*/
-
 import (
 	"fmt"
 	"sync"
